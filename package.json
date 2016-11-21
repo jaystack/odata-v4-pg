@@ -1,0 +1,46 @@
+{
+  "name": "odata-v4-pg",
+  "version": "0.1.0",
+  "description": "OData to PostgreSQL query compiler",
+  "main": "build/lib/index.js",
+  "typings": "build/lib/index",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "tsc",
+    "pretest": "npm run build",
+    "test": "mocha",
+    "pretdd": "npm run build",
+    "tdd": "mocha -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaystack/odata-v4-pg.git"
+  },
+  "keywords": [
+    "OData",
+    "V4",
+    "sql"
+  ],
+  "author": "JayStack",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jaystack/odata-v4-pg/issues"
+  },
+  "homepage": "https://github.com/jaystack/odata-v4-pg#readme",
+  "dependencies": {
+    "odata-v4-parser": "0.1.13",
+    "odata-v4-sql": "^0.1.1"
+  },
+  "devDependencies": {
+    "@types/config": "^0.0.30",
+    "@types/pg": "^6.1.34",
+    "chai": "^3.5.0",
+    "config": "^1.21.0",
+    "mocha": "^3.1.2",
+    "odata-v4-server": "rc",
+    "pg": "^6.1.0",
+    "typescript": "^2.0.6"
+  }
+}
