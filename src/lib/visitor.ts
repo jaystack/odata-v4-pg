@@ -103,6 +103,42 @@ export class PGVisitor extends Visitor{
 					this.where += ` like \$${this.parameters.length}`;
 				}else this.where += ` like '${SQLLiteral.convert(params[1].value, params[1].raw).slice(1, -1)}%'`;
 				break;
+			case "substring":
+				this.where += "SUBSTR(";
+				this.Visit(params[0], context);
+				this.where += ", ";
+				this.Visit(params[1], context);
+				this.where += " + 1";
+				if (params[2]){
+					this.where += ", ";
+					this.Visit(params[2], context);
+				}else{
+					this.where += ", CHAR_LENGTH(";
+					this.Visit(params[0], context);
+					this.where += ")";
+				}
+				this.where += ")";
+				break;
+			case "substringof":
+				this.Visit(params[1], context);
+				if (params[0].value == "Edm.String"){
+					if (this.options.useParameters){
+						let value = Literal.convert(params[0].value, params[0].raw);
+						this.parameters.push(`%${value}%`);
+						this.where += ` like \$${this.parameters.length}`;
+					}else this.where += ` like '%${SQLLiteral.convert(params[0].value, params[0].raw).slice(1, -1)}%'`;
+				}else{
+					this.where += " like ";
+					this.Visit(params[0], context);
+				}
+				break;
+			case "concat":
+				this.where += "(";
+				this.Visit(params[0], context);
+				this.where += " || ";
+				this.Visit(params[1], context);
+				this.where += ")";
+				break;
 			case "round":
 				this.where += "ROUND(";
 				this.Visit(params[0], context);

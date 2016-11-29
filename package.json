@@ -1,6 +1,6 @@
 {
   "name": "odata-v4-pg",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OData to PostgreSQL query compiler",
   "main": "build/lib/index.js",
   "typings": "build/lib/index",
