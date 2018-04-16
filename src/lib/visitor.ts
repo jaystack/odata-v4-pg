@@ -49,8 +49,10 @@ export class PGVisitor extends Visitor{
 		this.where += " = ";
 		this.Visit(node.value.right, context);
 		if (this.options.useParameters && context.literal == null){
-			this.where = this.where.replace(/= \?$/, "IS NULL").replace(new RegExp(`\\? = "${context.identifier}"$`), `"${context.identifier}" IS NULL`);
-		}else if (context.literal == "NULL"){
+            this.where = this.where.replace(/= \$\d*$/, "IS NULL")
+                .replace(new RegExp(`\\$\\d* = "${context.identifier}"$`),
+                    `"${context.identifier}" IS NULL`);
+		} else if (context.literal == "NULL"){
 			this.where = this.where.replace(/= NULL$/, "IS NULL").replace(new RegExp(`NULL = "${context.identifier}"$`), `"${context.identifier}" IS NULL`);
 		}
 	}
@@ -60,8 +62,10 @@ export class PGVisitor extends Visitor{
 		this.where += " <> ";
 		this.Visit(node.value.right, context);
 		if (this.options.useParameters && context.literal == null){
-			this.where = this.where.replace(/<> \?$/, "IS NOT NULL").replace(new RegExp(`\\? <> "${context.identifier}"$`), `"${context.identifier}" IS NOT NULL`);
-		}else if (context.literal == "NULL"){
+		    this.where = this.where.replace(/<> \$\d*$/, "IS NOT NULL")
+                .replace(new RegExp(`\\$\\d* <> "${context.identifier}"$`),
+                    `"${context.identifier}" IS NOT NULL`);
+		} else if (context.literal == "NULL"){
 			this.where = this.where.replace(/<> NULL$/, "IS NOT NULL").replace(new RegExp(`NULL <> "${context.identifier}"$`), `"${context.identifier}" IS NOT NULL`);
 		}
 	}
@@ -70,9 +74,11 @@ export class PGVisitor extends Visitor{
 		if (this.options.useParameters){
 			let value = Literal.convert(node.value, node.raw);
 			context.literal = value;
-			this.parameters.push(value);
+			if (context.literal != null) {
+			    this.parameters.push(value);
+			}
 			this.where += `\$${this.parameters.length}`;
-		}else this.where += (context.literal = SQLLiteral.convert(node.value, node.raw));
+		} else this.where += (context.literal = SQLLiteral.convert(node.value, node.raw));
 	}
 
 	protected VisitMethodCallExpression(node:Token, context:any){

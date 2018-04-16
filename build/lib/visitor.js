@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const odata_v4_literal_1 = require("odata-v4-literal");
 const visitor_1 = require("odata-v4-sql/lib/visitor");
 class PGVisitor extends visitor_1.Visitor {
@@ -43,7 +44,8 @@ class PGVisitor extends visitor_1.Visitor {
         this.where += " = ";
         this.Visit(node.value.right, context);
         if (this.options.useParameters && context.literal == null) {
-            this.where = this.where.replace(/= \?$/, "IS NULL").replace(new RegExp(`\\? = "${context.identifier}"$`), `"${context.identifier}" IS NULL`);
+            this.where = this.where.replace(/= \$\d*$/, "IS NULL")
+                .replace(new RegExp(`\\$\\d* = "${context.identifier}"$`), `"${context.identifier}" IS NULL`);
         }
         else if (context.literal == "NULL") {
             this.where = this.where.replace(/= NULL$/, "IS NULL").replace(new RegExp(`NULL = "${context.identifier}"$`), `"${context.identifier}" IS NULL`);
@@ -54,7 +56,8 @@ class PGVisitor extends visitor_1.Visitor {
         this.where += " <> ";
         this.Visit(node.value.right, context);
         if (this.options.useParameters && context.literal == null) {
-            this.where = this.where.replace(/<> \?$/, "IS NOT NULL").replace(new RegExp(`\\? <> "${context.identifier}"$`), `"${context.identifier}" IS NOT NULL`);
+            this.where = this.where.replace(/<> \$\d*$/, "IS NOT NULL")
+                .replace(new RegExp(`\\$\\d* <> "${context.identifier}"$`), `"${context.identifier}" IS NOT NULL`);
         }
         else if (context.literal == "NULL") {
             this.where = this.where.replace(/<> NULL$/, "IS NOT NULL").replace(new RegExp(`NULL <> "${context.identifier}"$`), `"${context.identifier}" IS NOT NULL`);
@@ -64,7 +67,9 @@ class PGVisitor extends visitor_1.Visitor {
         if (this.options.useParameters) {
             let value = odata_v4_literal_1.Literal.convert(node.value, node.raw);
             context.literal = value;
-            this.parameters.push(value);
+            if (context.literal != null) {
+                this.parameters.push(value);
+            }
             this.where += `\$${this.parameters.length}`;
         }
         else
